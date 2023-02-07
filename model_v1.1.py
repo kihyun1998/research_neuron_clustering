@@ -1,5 +1,5 @@
 """
-This model confirm input of synapses in specific dendrites
+This model confirm input of synapses in specific dendrites (five synapse)
 """
 
 from neuron import h
@@ -11,18 +11,22 @@ h.load_file("pyrCell.hoc")
 myCell = h.pyrCell()
 
 
-stim = h.NetStim()
-stim.number=5
-stim.start=5000
-stim.interval=800
+stims=[];interval=10
+for i in range(5):
+    startTime = 5000 + i*interval
+    stim = h.NetStim()
+    stim.number=1
+    stim.start= startTime
+    # stim.interval=0
+
+    stims.append(stim)
 
 
-n1=0;r1=11
-syns=[]
-for i in range(r1+1):
-    syn = h.Exp2Syn(n1, sec=myCell.apic[63])
-    n1+= 1/r1
-    n1=round(n1,2)
+
+syns=[];seg=0.18
+for i in range(5):
+    syn = h.Exp2Syn(seg, sec=myCell.apic[20])
+    seg+=0.18
     syn.e = 0
     syn.tau1 = 0.3
     syn.tau2 = 3
@@ -30,8 +34,8 @@ for i in range(r1+1):
 
 
 ncs=[]
-for i in range(r1+1):
-    nc = h.NetCon(stim, syns[i])
+for i in range(5):
+    nc = h.NetCon(stims[i], syns[i])
     nc.delay=1
     nc.weight[0] = 0.0003
     ncs.append(nc)
@@ -49,7 +53,7 @@ h.continuerun(10000)
 
 plt.ylabel('Voltage [mV]')
 plt.xlabel('Time [ms]')
-plt.xlim(4500,8500)
+plt.xlim(4800,8500)
 plt.plot(t,rec,label='soma(0.5)')
 plt.legend()
 plt.show()
